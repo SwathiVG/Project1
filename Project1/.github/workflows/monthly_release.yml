@@ -1,0 +1,39 @@
+name: Monthly Git Release
+
+on:
+  schedule:
+    - cron: "0 0 25 * *"  # Runs at midnight UTC on the 25th of every month
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "SwathiVG"
+          git config --global user.email "abc@github.com"
+
+      - name: Create and Merge Release Branch
+        run: |
+          MONTH=$(date +"%m")
+          YEAR=$(date +"%Y")
+          RELEASE_BRANCH="release-${YEAR}-${MONTH}"
+
+          git checkout -b "$RELEASE_BRANCH" origin/develop
+          git push origin "$RELEASE_BRANCH"
+
+          git checkout main
+          git merge "$RELEASE_BRANCH"
+          git push origin main
+
+      - name: Tag the Release
+        run: |
+          VERSION_TAG="v${YEAR}.${MONTH}"
+          git tag -a "$VERSION_TAG" -m "Automated Monthly Release for ${YEAR}-${MONTH}"
+          git push origin "$VERSION_TAG"
+
+      - name: Notify Success
+        run: echo "🎉 Release ${VERSION_TAG} merged successfully!"
