@@ -5,7 +5,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 0 25 * *" # Runs every MOnth 25th 
+    - cron: "0 0 25 * *" # Runs every Month 25th date 
 
 jobs:
   build:
